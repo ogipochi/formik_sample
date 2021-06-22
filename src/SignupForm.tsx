@@ -1,5 +1,5 @@
 import React from "react";
-import { ErrorMessage, Field, Formik } from "formik";
+import { Formik, useField, FieldHookConfig } from "formik";
 import * as Yup from "yup";
 
 /**
@@ -9,6 +9,33 @@ type FormValueType = {
     email: string;
     firstName: string;
     lastName: string;
+};
+
+/**
+ * [ props ] MyTextFieldのプロパティ
+ */
+type MyTextFieldProps = FieldHookConfig<string> & {
+    label: string;
+};
+
+/**
+ * [ component ] カスタム入力フォーム
+ * labelにはラベル内のコンテンツとして表示する文字列を渡し、
+ * nameには対象プロパティ名を渡します
+ * @param param0
+ * @returns
+ */
+const MyTextField = ({ label, ...props }: MyTextFieldProps) => {
+    const [field, meta, helper] = useField(props);
+    return (
+        <>
+            <label htmlFor={props.id || props.name}>{label}</label>
+            <input className="text-input" {...field} />
+            {meta.touched && meta.error ? (
+                <div className="error">{meta.error}</div>
+            ) : null}
+        </>
+    );
 };
 
 /**
@@ -52,15 +79,9 @@ const SignupForm = () => {
             {(formik) => {
                 return (
                     <form onSubmit={formik.handleSubmit}>
-                        <label htmlFor="email">メールアドレス</label>
-                        <Field name="email" type="text" />
-                        <ErrorMessage name="email" />
-                        <label htmlFor="lastName">姓</label>
-                        <Field name="lastName" type="text" />
-                        <ErrorMessage name="firstName" />
-                        <label htmlFor="firstName">名</label>
-                        <Field name="firstName" type="firstName" />
-                        <ErrorMessage name="firstName" />
+                        <MyTextField label="メールアドレス" name="email" type="email" onClick={()=>{console.log("マウスが通過")}}/>
+                        <MyTextField label="姓" name="lastName" type="text"/>
+                        <MyTextField label="名" name="firstName" type="text"/>
                         <button type="submit">送信</button>
                     </form>
                 );
