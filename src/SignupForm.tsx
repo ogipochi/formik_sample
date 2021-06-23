@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, useField, FieldHookConfig } from "formik";
+import { Formik, useField, FieldHookConfig, FieldInputProps, GenericFieldHTMLAttributes, FieldConfig, Field } from "formik";
 import * as Yup from "yup";
 
 /**
@@ -13,8 +13,9 @@ type FormValueType = {
 
 /**
  * [ props ] MyTextFieldのプロパティ
+ * 入力要素をinputに限定
  */
-type MyTextFieldProps = FieldHookConfig<string> & {
+type MyTextFieldProps = JSX.IntrinsicElements['input'] & FieldConfig<string> &{
     label: string;
 };
 
@@ -26,17 +27,21 @@ type MyTextFieldProps = FieldHookConfig<string> & {
  * @returns
  */
 const MyTextField = ({ label, ...props }: MyTextFieldProps) => {
-    const [field, meta, helper] = useField(props);
+    const [field, meta ] = useField(props);
+
+    // inputの属性のみを抽出
+    const {component, as, render, children, validate, name, type, value, innerRef, ...rest} = props;
     return (
         <>
             <label htmlFor={props.id || props.name}>{label}</label>
-            <input className="text-input" {...field} />
+            <input className="text-input" {...field} {...rest}/>
             {meta.touched && meta.error ? (
                 <div className="error">{meta.error}</div>
             ) : null}
         </>
     );
 };
+
 
 /**
  * バリデーションスキーマ
@@ -79,9 +84,9 @@ const SignupForm = () => {
             {(formik) => {
                 return (
                     <form onSubmit={formik.handleSubmit}>
-                        <MyTextField label="メールアドレス" name="email" type="email" onClick={()=>{console.log("マウスが通過")}}/>
-                        <MyTextField label="姓" name="lastName" type="text"/>
-                        <MyTextField label="名" name="firstName" type="text"/>
+                        <MyTextField label="メールアドレス" name="email" type="email" onClick={()=>{console.log("クリックemail")}}/>
+                        <MyTextField label="姓" name="lastName" type="text" onKeyDown={()=>{console.log("キーダウンlastName")}}/>
+                        <MyTextField label="名" name="firstName" type="text" onDoubleClick={()=>{console.log("ダブルクリックfirstName")}}/>
                         <button type="submit">送信</button>
                     </form>
                 );
